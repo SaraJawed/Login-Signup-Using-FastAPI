@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FastAPI Auth</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+  <style>
+    body {
+      transition: 0.3s ease-in-out;
+      background: #f9fafc;
+    }
+    .navbar {
+      background: white;
+      border-bottom: 1px solid #e6e6e6;
+    }
+    .navbar-brand {
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #0d6efd !important;
+    }
+    .navbar-brand span {
+      color: #20c997;
+    }
+    .hero {
+      background: linear-gradient(135deg, #6ec1e4, #9be7ff);
+      color: #004085;
+      padding: 60px 20px;
+      border-radius: 0 0 25px 25px;
+      margin-bottom: 40px;
+      text-align: center;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+    .card {
+      border-radius: 20px;
+      border: none;
+      background: #ffffff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease-in-out;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(8px);
+    }
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+    }
+    .form-label {
+      font-weight: 600;
+    }
+    .btn {
+      border-radius: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg px-4">
+    <a class="navbar-brand fw-bold" href="#">
+      🚀 FastAPI <span>Auth</span>
+    </a>
+    <div class="ms-auto d-flex align-items-center gap-3">
+      <span id="authStatus" class="badge bg-secondary px-3 py-2">Logged Out</span>
+      <button class="btn btn-sm btn-outline-primary" id="toggleTheme">🌙 Dark</button>
+      <button class="btn btn-sm btn-danger d-none" id="logoutBtn">Logout</button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero">
+    <h1 class="fw-bold">Authentication</h1>
+    <p class="lead mb-0">Signup • Login • Profile — Powered by FastAPI</p>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container"></div>
+
+  <div class="container pb-5">
+    <div class="row g-4">
+      <!-- Signup Section -->
+      <div class="col-lg-6">
+        <div class="card glass-card h-100">
+          <div class="card-body p-5">
+            <h3 class="card-title text-center mb-4 fw-bold text-success">📝 Create Account</h3>
+            <p class="text-muted text-center mb-4">Start your journey in just a few steps.</p>
+
+            <form id="signupForm" class="row g-3">
+              <div class="col-12">
+                <label class="form-label">Email Address</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+                  <input type="email" name="email" class="form-control" placeholder="you@example.com" required>
+                </div>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Password</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+                  <input type="password" name="password" id="signupPassword" class="form-control" placeholder="••••••••" required>
+                  <button class="btn btn-outline-secondary" type="button" id="togglePassword"><i class="bi bi-eye"></i></button>
+                </div>
+                <small class="text-muted">Must be at least 6 characters</small>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Full Name</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                  <input type="text" name="full_name" class="form-control" placeholder="John Doe">
+                </div>
+              </div>
+              <div class="col-12">
+                <button type="submit" class="btn btn-success w-100 py-2">Create Account</button>
+              </div>
+              <div class="col-12 text-center">
+                <small class="text-muted">Already have an account? <a href="#" class="text-primary fw-semibold">Login</a></small>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Login Section -->
+      <div class="col-lg-6">
+        <div class="card glass-card h-100">
+          <div class="card-body p-5">
+            <h3 class="card-title text-center mb-4 fw-bold text-primary">🔑 Welcome Back</h3>
+            <p class="text-muted text-center mb-4">Login to continue to your dashboard.</p>
+
+            <form id="loginForm" class="row g-3">
+              <div class="col-12">
+                <label class="form-label">Email Address</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+                  <input type="text" name="username" class="form-control" placeholder="you@example.com" required>
+                </div>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Password</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+                  <input type="password" name="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+                  <button class="btn btn-outline-secondary" type="button" id="toggleLoginPassword"><i class="bi bi-eye"></i></button>
+                </div>
+              </div>
+              <div class="col-12">
+                <button type="submit" class="btn btn-primary w-100 py-2">Login</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile -->
+    <div class="row mt-4 justify-content-center">
+      <div class="col-lg-6 col-md-8">
+        <div class="card glass-card h-100">
+          <div class="card-body p-4 text-center">
+            <div class="mb-3">
+              <div class="bg-warning bg-opacity-25 text-warning d-inline-flex align-items-center justify-content-center rounded-circle" 
+                   style="width:60px; height:60px; font-size:1.8rem;">
+                <i class="bi bi-person-circle"></i>
+              </div>
+            </div>
+            <h4 class="fw-bold text-warning mb-2">My Profile</h4>
+            <button id="meBtn" class="btn btn-warning w-100 fw-semibold rounded-pill">Get My Profile</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Section -->
+    <div class="row mt-4 justify-content-center" id="adminSection" style="display:none;">
+      <div class="col-lg-8">
+        <div class="card glass-card">
+          <div class="card-body p-4">
+            <h4 class="fw-bold text-primary mb-3">👥 Manage Users (Admin Only)</h4>
+            <button id="getUsersBtn" class="btn btn-outline-primary mb-3">Get All Users</button>
+            <div id="usersList" class="mt-3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  let token = "";
+  let darkMode = false;
+
+  function showToast(msg, type="success") {
+    let toastContainer = document.querySelector(".toast-container");
+    let toast = document.createElement("div");
+    toast.className = "toast align-items-center text-bg-" + type + " border-0 show";
+    toast.role = "alert";
+    toast.innerHTML = `<div class="d-flex"><div class="toast-body">${msg}</div>
+                       <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>`;
+    toastContainer.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
+
+  function updateAuthStatus(loggedIn) {
+    let badge = document.getElementById("authStatus");
+    badge.textContent = loggedIn ? "Logged In" : "Logged Out";
+    badge.className = "badge status-badge " + (loggedIn ? "bg-success" : "bg-secondary");
+  }
+
+  document.getElementById("logoutBtn").onclick = () => {
+    token = "";
+    document.getElementById("logoutBtn").classList.add("d-none");
+    document.getElementById("tokenSection").classList.add("d-none");
+    document.getElementById("adminSection").style.display = "none";
+    updateAuthStatus(false);
+    showToast("Logged out successfully!", "warning");
+  };
+
+  document.getElementById("toggleTheme").onclick = () => {
+    darkMode = !darkMode;
+    document.body.className = darkMode ? "bg-dark text-white" : "bg-light text-dark";
+    document.getElementById("toggleTheme").textContent = darkMode ? "☀️ Light" : "🌙 Dark";
+  };
+
+  document.getElementById("copyToken").onclick = () => {
+    navigator.clipboard.writeText(token);
+    showToast("Token copied to clipboard!", "info");
+  };
+
+  // ✅ Signup
+  document.getElementById("signupForm").onsubmit = async (e) => {
+    e.preventDefault();
+    let formData = {
+      email: e.target.email.value,
+      password: e.target.password.value,
+      full_name: e.target.full_name.value
+    };
+    let res = await fetch("/auth/signup", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(formData)
+    });
+    // Removed JSON print
+    res.ok ? showToast("Signup successful!", "success") : showToast("Signup failed!", "danger");
+  };
+
+  // ✅ Login
+  document.getElementById("loginForm").onsubmit = async (e) => {
+    e.preventDefault();
+    let form = new URLSearchParams();
+    form.append("username", e.target.username.value);
+    form.append("password", e.target.password.value);
+
+    let res = await fetch("/auth/login", {
+      method: "POST",
+      headers: {"Content-Type": "application/x-www-form-urlencoded"},
+      body: form
+    });
+    let data = await res.json();
+    if (res.ok && data.access_token) {
+      token = data.access_token;
+      document.getElementById("logoutBtn").classList.remove("d-none");
+      document.getElementById("tokenSection").classList.remove("d-none");
+      // Removed tokenBox + loginResponse print
+      updateAuthStatus(true);
+      showToast("Login successful!", "success");
+    } else {
+      updateAuthStatus(false);
+      showToast("Login failed!", "danger");
+    }
+  };
+
+  // ✅ Profile
+  document.getElementById("meBtn").onclick = async () => {
+    if (!token) return showToast("Please login first!", "danger");
+    let res = await fetch("/users/me", {
+      headers: { Authorization: "Bearer " + token }
+    });
+    let data = await res.json();
+    // Removed meResponse print
+    if (res.ok) {
+      showToast("Profile fetched!", "info");
+      if (data.is_admin) {
+        document.getElementById("adminSection").style.display = "block";
+      }
+    } else {
+      showToast("Failed to fetch profile!", "danger");
+    }
+  };
+
+  // ✅ Admin: Get All Users
+  document.getElementById("getUsersBtn").onclick = async () => {
+    let res = await fetch("/users/", {
+      headers: { Authorization: "Bearer " + token }
+    });
+    let data = await res.json();
+    if (res.ok) {
+      let listHtml = "<ul class='list-group'>";
+      data.forEach(user => {
+        listHtml += `
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            ${user.email} 
+            ${user.is_admin ? 
+              '<span class="badge bg-success">Admin</span>' : 
+              `<button class="btn btn-sm btn-warning makeAdminBtn" data-id="${user.id}">Make Admin</button>`
+            }
+          </li>`;
+      });
+      listHtml += "</ul>";
+      document.getElementById("usersList").innerHTML = listHtml;
+
+      document.querySelectorAll(".makeAdminBtn").forEach(btn => {
+        btn.onclick = async () => {
+          let userId = btn.getAttribute("data-id");
+          let res = await fetch(`/users/make-admin/${userId}`, {
+            method: "PUT",
+            headers: { Authorization: "Bearer " + token }
+          });
+          let result = await res.json();
+          if (res.ok) {
+            showToast(result.message, "success");
+            document.getElementById("getUsersBtn").click();
+          } else {
+            showToast(result.detail || "Error", "danger");
+          }
+        };
+      });
+    } else {
+      showToast("Failed to load users", "danger");
+    }
+  };
+</script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
