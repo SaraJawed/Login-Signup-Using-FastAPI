@@ -1,8 +1,8 @@
-FastAPI User Auth Project
-
+**FastAPI User Auth Project
+**
 This project is a step-by-step implementation of User Authentication with FastAPI, following a Day-by-Day learning plan.
 
-Day 2 – REST Basics
+**Day 2 – REST Basics**
 
 Implemented user signup endpoint → POST /auth/signup
 
@@ -10,7 +10,7 @@ Used Pydantic models for validation (UserCreate, UserOut)
 
 Explored Swagger UI at /docs and Redoc at /redoc
 
-Day 3 – Database Intro
+**Day 3 – Database Intro**
 
 Connected to SQLite using SQLAlchemy
 
@@ -20,7 +20,7 @@ Persisted users in the database instead of in-memory dict
 
 Signup endpoint now stores data in SQLite
 
-Day 4 – Authentication
+**Day 4 – Authentication**
 
 Implemented JWT login → POST /auth/login
 
@@ -30,7 +30,7 @@ Hashed passwords using passlib (bcrypt)
 
 Protected route /users/me → only accessible with a valid token
 
-Day 5 – Project Structuring
+**Day 5 – Project Structuring**
 
 Refactored into:
 
@@ -52,11 +52,11 @@ Normal users → 403 Not enough permissions
 
 Admins → can see full user list
 
-How to Run
+**How to Run**
 uvicorn app.main:app --reload
 
 
-Open browser:
+**Open browser:**
 
 Swagger UI → http://127.0.0.1:8000/docs
 
@@ -64,8 +64,8 @@ Redoc → http://127.0.0.1:8000/redoc
 
 Frontend → http://127.0.0.1:8000/
 
-Admin Access
-
+**Admin Access
+**
 To test /users/ list:
 
 Create a user via /auth/signup
